@@ -91,3 +91,50 @@ Set-OfficeWebAppsFarm -ExcelWarnOnDataRefresh:$false
 Set-OfficeWebAppsFarm -EditingEnabled:$true
 Set-OfficeWebAppsFarm -OpenFromUrlEnabled:$true
 Set-OfficeWebAppsFarm -ClipartEnabled:$true
+
+#Verify that the Office Online Server farm was created successfully
+#After the farm is created, details about the farm are displayed in the Windows PowerShell prompt. To verify that Office Online Server is installed and configured correctly, use a web browser to access the Office Online Server discovery URL, as shown in the following example. **_The discovery URL is the InternalUrl parameter you specified when you configured your Office Online Server farm, followed by /hosting/discovery, for example_**:
+#<InternalUrl>/hosting/discovery
+#If Office Online Server works as expected, you should see a Web Application Open Platform Interface Protocol (WOPI)-discovery XML file in your web browser. The first few lines of that file should resemble the following example:
+#XML
+
+#<?xml version="1.0" encoding="utf-8" ?> 
+#<wopi-discovery>
+#<net-zone name="internal-http">
+#<app name="Excel" favIconUrl="<InternalUrl>/x/_layouts/images/FavIcon_Excel.ico" checkLicense="true">
+#<action name="view" ext="ods" default="true" urlsrc="<InternalUrl>/x/_layouts/xlviewerinternal.aspx?<ui=UI_LLCC&><rs=DC_LLCC&>" /> 
+#<action name="view" ext="xls" default="true" urlsrc="<InternalUrl>/x/_layouts/xlviewerinternal.aspx?<ui=UI_LLCC&><rs=DC_LLCC&>" /> 
+#<action name="view" ext="xlsb" default="true" urlsrc="<InternalUrl>/x/_layouts/xlviewerinternal.aspx?<ui=UI_LLCC&><rs=DC_LLCC&>" /> 
+#<action name="view" ext="xlsm" default="true" urlsrc="<InternalUrl>/x/_layouts/xlviewerinternal.aspx?<ui=UI_LLCC&><rs=DC_LLCC&>" /> 
+
+**Configure Excel workbook maximum size**
+#The maximum file size for all files in Power BI Report Server is 100 MB. To stay in sync with that, you need to manually set this in OOS.
+#PowerShell:
+#Set-OfficeWebAppsFarm -ExcelWorkbookSizeMax 100
+#Using EffectiveUserName with Analysis Services
+#To allow for live connections to Analysis Services, for connections within an Excel workbook that make use of EffectiveUserName. For OOS to make use of EffectiveUserName, you will need to add the machine account of the OOS server as an administrator for the Analysis Services instance. Management Studio for SQL Server 2016 or later is needed to do this.
+#Only embedded Analysis Services connections are currently supported within an Excel workbook. The user's account will need to have permission to connect to Analysis Services as the ability to proxy the user is not available.
+#Run the following PowerShell commands on the OOS Server.
+#PowerShell
+#Set-OfficeWebAppsFarm -ExcelUseEffectiveUserName:$true
+#Set-OfficeWebAppsFarm -ExcelAllowExternalData:$true
+#Set-OfficeWebAppsFarm -ExcelWarnOnDataRefresh:$false
+#Configure a Power Pivot instance for data models
+#Installing an Analysis Services Power Pivot mode instance lets you work with Excel workbooks that are using Power Pivot. Make sure that the instance name is POWERPIVOT. Add the machine account of the OOS server as an administrator, for the Analysis Services Power Pivot mode instance. Management Studio for SQL Server 2016 or later is needed to do this.
+#For OOS to use the Power Pivot mode instance, run the following command.
+#PowerShell
+#New-OfficeWebAppsExcelBIServer -ServerId <server_name>\POWERPIVOT
+#If you did not already allow external data, from the Analysis Services step above, run the following command.
+#PowerShell
+#Set-OfficeWebAppsFarm -ExcelAllowExternalData:$true
+#Firewall considerations
+#To avoid firewall issues, you may need to open the ports 2382 and 2383. You can also add the msmdsrv.exe, for the Power Pivot instance, as an application firewall wall policy.
+#Configure Power BI Report Server to use the OOS Server
+#On the General page of Site settings, enter the OOS discovery url. The OOS discovery url is the InternalUrl, used when deploying the OOS server, followed by /hosting/discovery. For example, https://servername/hosting/discovery, for HTTP. And, https://server.contoso.com/hosting/discovery for HTTPS.
+#To get to Site settings, select the gear icon in the upper right and select Site settings.
+#Only a user with the System Administrator role will see the Office Online Server discovery url setting.
+#Site settings for Power BI Report Server.
+#After you enter the discovery url, and select Apply, selecting an Excel workbook, within the web portal, should display the workbook within the web portal.
+#Considerations and limitations
+#    You will have read only capability with workbooks.
+#    Scheduled refresh isn't supported for Excel workbooks in Power BI Report Server.
