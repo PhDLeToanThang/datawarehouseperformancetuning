@@ -11,7 +11,6 @@ Add-WindowsFeature Web-Server,Web-Mgmt-Tools,Web-Mgmt-Console,Web-WebServer,Web-
 #   Download Office Online Server from the Volume Licensing Service Center (VLSC). 
 #   (https://go.microsoft.com/fwlink/p/?LinkId=256561)
 #The download is located under those Office products on #the VLSC portal. For development purposes, you can download OOS from MSDN #subscriber downloads.
-#
 #    Run Setup.exe.
 #    On the Read the Microsoft Software License Terms page, select I accept the terms of this agreement and select Continue.
 #    On the Choose a file location page, select the folder where you want the Office Online Server files to be installed (for example, #C:\Program Files\Microsoft Office Web Apps*) and select Install Now. If the folder you specified doesn’t exist, Setup creates it for you.
