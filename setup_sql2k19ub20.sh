@@ -1,3 +1,4 @@
+#!/bin/bash
 #Setup Microsoft SQL Server on Ubuntu 20.04 
 #Update Ubuntu
 
