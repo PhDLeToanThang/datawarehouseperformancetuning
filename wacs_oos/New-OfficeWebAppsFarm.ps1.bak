@@ -1,0 +1,156 @@
+﻿#Add-WindowsFeature Web-Server,Web-Mgmt-Tools,Web-Mgmt-Console,Web-WebServer,Web-Common-Http,Web-Default-Doc,Web-Static-Content,Web-Performance,Web-Stat-Compression,Web-Dyn-Compression,Web-Security,Web-Filtering,Web-Windows-Auth,Web-App-Dev,Web-Net-Ext45,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Includes,InkandHandwritingServices,NET-Framework-Features,NET-Framework-Core,NET-HTTP-Activation,NET-Non-HTTP-Activ,NET-WCF-HTTP-Activation45,Windows-Identity-Foundation,Server-Media-Foundation
+
+
+Import-Module -Name OfficeWebApps
+Import-Module "C:\Program Files\Microsoft Office Web Apps\AdminModule\OfficeWebApps\OfficeWebApps.psd1"
+New-OfficeWebAppsFarm -InternalURL "https://owa.cloud.edu.vn" -ExternalUrl "https://owa.cloud.edu.vn" -CertificateName "owa" -AllowHttp -EditingEnabled
+#New-OfficeWebAppsFarm -InternalURL "https://owa.cloud.edu.vn" -AllowHttp -EditingEnabled
+
+Set-OfficeWebAppsFarm -ExcelWorkbookSizeMax 100
+Set-OfficeWebAppsFarm -ExcelUseEffectiveUserName:$true
+Set-OfficeWebAppsFarm -ExcelAllowExternalData:$true
+Set-OfficeWebAppsFarm -ExcelWarnOnDataRefresh:$false
+#Set-OfficeWebAppsFarm -DocumentInfoCacheSize:$true
+
+Troubleshooting Office Online Server and Office Web Apps Server:
+https://www.catapultsystems.com/blogs/troubleshooting-office-online-server-and-office-web-apps-server/
+
+
+
+Make sure that you start it as an administrator.
+
+Once started, enter “Import-Module OfficeWebApps” and hit enter
+
+
+
+The above command will enable all Office Web Apps related PowerShell commands. The PowerShell commands are:
+
+
+
+The “get-Office* commands provides information on appropriate configuration.
+
+The “New-Office*” commands allow to create appropriate configuration.
+
+The “Remove-Office*” commands allow to remove or delete the configuration.
+
+The “Repair-OfficeWebAppsFarm” command allow you to revert or repair the farm configuration. Please note that the Repair-OfficeWebAppsFarm cmdlet removes all servers flagged as unhealthy from a WAC farm.
+
+The “Set-Office*” commands allow you to set specific fields in the configuration.
+
+The details of all available PowerShell commands can be found at Office Online Server PowerShell OR Office Web Apps Server PowerShell respectively. Please note that Office Online server PowerShell is an extended set from Office Web Apps PowerShell.
+
+Checking the Farm:
+Entering the “Get-OfficeWebApps” returns current configuration of farm:
+
+
+
+When the farm is corrupted, removed or not available, the following error will be returned.
+
+
+
+Checking the Host:
+Entering the “Get-OfficeWebAppsHost” returns the information about allowed domain
+
+
+
+Checking the Machine:
+Entering the “Get-OfficeWebAppsMachine” returns the status of the Office Web Apps system on the server
+
+
+
+When there are errors in Office Web Apps event viewer associated with watchdog, the status of the machine will show “Unhealthy”.
+
+Issues: Get-OfficeWebAppsMachine returns “Unhealthy” status
+This issue generally occurs when the Office Web Apps deployment was not done correctly, missing updates, missing pre-requisites or corrupted farm configuration (in case of post deployment).
+
+Doug Deitterick’s Blog on TechNet – How to Get Office Web Apps Server 2013 to Report a Healthy Health Status – describes two possible scenarios and solution. The blog is written with Lync Server 2013 deployment. Please note that these two scenarios and solutions apply to Skype for Business Server 2015 deployment as well.
+
+However, in some instances the machine still shows unhealthy status. The event viewer shows one or more errors from “Office Web Apps Monitoring” component.
+
+
+
+
+
+
+
+After reboot of the server, one can see these errors repeating at every minute and slowly reporting at every 5 minutes.
+
+Cause of the problem –
+There are few causes of this problem. They are –
+
+1) Certificate error – Could not establish trust relationship for the SSL/TLS secure channel with authority <Certificate Authority>
+
+2) Error on health report – AgentManagerWatchdog reported status for AgentManagerWatchdog in category ‘Recent Watchdog Reports’. Reported status: Machine health is Unhealthy
+
+3) Unknown reasons – AgentManagerWatchdog reported status for AgentManagerWatchdog in category ‘Recent Watchdog Reports’. Please see Inner Exception. Reported status: Machine health is Unhealthy
+
+Usually, the inner exceptions points to some type of corruption in the Office Web Apps farm.
+
+Resolution –
+The resolution of Certificate error and Error on health reports are documented in Doug Deitterick’s Blog on TechNet – How to Get Office Web Apps Server 2013 to Report a Healthy Health Status.
+
+The steps below are for resolving the “Unknown reasons” cause. To resolve this issue, please follow the steps below:
+
+Step 1: Remove Office Web Apps Farm by entering “Remove-OfficeWebAppsFarm”. This command will remove all office web apps configurations.
+
+Step 2: Uninstall Office Web Apps software
+
+Step 3: Install all pre-requisites by running the command
+
+Office Web Apps Server 2013:
+Note: The Office Web Apps Server 2013 cannot be deployed on Windows Server 2016.
+
+Windows Server 2008 R2 –
+Add-WindowsFeature Web-Server,Web-WebServer,Web-Common-Http,Web-Static-Content,Web-App-Dev,Web-Asp-Net,Web-Net-Ext,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Includes,Web-Security,Web-Windows-Auth,Web-Filtering,Web-Stat-Compression,Web-Dyn-Compression,Web-Mgmt-Console,Ink-Handwriting,IH-Ink-Support
+
+Windows Server 2012 –
+Add-WindowsFeature Web-Server,Web-Mgmt-Tools,Web-Mgmt-Console,Web-WebServer,Web-Common-Http,Web-Default-Doc,Web-Static-Content,Web-Performance,Web-Stat-Compression,Web-Dyn-Compression,Web-Security,Web-Filtering,Web-Windows-Auth,Web-App-Dev,Web-Net-Ext45,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Includes,InkandHandwritingServices,NET-WCF-HTTP-Activation45
+
+Windows Server 2012 R2 –
+Install .NET Framework 4.5.2
+Add-WindowsFeature Web-Server,Web-Mgmt-Tools,Web-Mgmt-Console,Web-WebServer,Web-Common-Http,Web-Default-Doc,Web-Static-Content,Web-Performance,Web-Stat-Compression,Web-Dyn-Compression,Web-Security,Web-Filtering,Web-Windows-Auth,Web-App-Dev,Web-Net-Ext45,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Includes,InkandHandwritingServices,NET-Framework-Features,NET-Framework-Core,NET-HTTP-Activation,NET-Non-HTTP-Activ,NET-WCF-HTTP-Activation45
+Office Online Server 2016:
+Note: The Office Online Server 2016 cannot be deployed on Windows Server 2008 R2 or Windows Server 2012.
+
+Windows Server 2012 R2 –
+Install .NET Framework 4.5.2
+Install Visual C++ Redistributable Packages for Visual Studio 2013
+Install Visual C++ Redistributable for Visual Studio 2015
+Microsoft.IdentityModel.Extention.dll
+Add-WindowsFeature Web-Server, Web-Mgmt-Tools, Web-Mgmt-Console, Web-WebServer, Web-Common-Http, Web-Default-Doc, Web-Static-Content, Web-Performance, Web-Stat-Compression, Web-Dyn-Compression, Web-Security, Web-Filtering, Web-Windows-Auth, Web-App-Dev, Web-Net-Ext45, Web-Asp-Net45, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Includes, InkandHandwritingServices, Windows-Identity-Foundation
+Windows Server 2016 –
+Install .NET Framework 4.5.2
+Install Visual C++ Redistributable Packages for Visual Studio 2013
+Install Visual C++ Redistributable for Visual Studio 2015
+Microsoft.IdentityModel.Extention.dll
+Add-WindowsFeature Web-Server,Web-Mgmt-Tools,Web-Mgmt-Console,Web-WebServer,Web-Common-Http,Web-Default-Doc,Web-Static-Content,Web-Performance,Web-Stat-Compression,Web-Dyn-Compression,Web-Security,Web-Filtering,Web-Windows-Auth,Web-App-Dev,Web-Net-Ext45,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Includes,NET-Framework-Features,NET-Framework-45-Features,NET-Framework-Core,NET-Framework-45-Core,NET-HTTP-Activation,NET-Non-HTTP-Activ,NET-WCF-HTTP-Activation45,Windows-Identity-Foundation,Server-Media-Foundation
+Note: Office Online Server April 2017 or later is required to deploy on Windows Server 2016.
+
+Step 4: Install/Re-install Office Web Apps software
+
+Step 5: Rebuild the farm – Create the Farm
+
+New-OfficeWebAppsFarm -InternalUrl “https://<Internal URL FQDN>” -ExternalUrl “https://<External URL FQDN>”-CertificateName “<Certificate’s Friendly Name>” -EditingEnabled -AllowHTTP –Verbose
+
+
+
+Step 6: Create the Host
+
+New-OfficeWebAppsHost -Domain “<Domain>.com” –Verbose
+
+
+
+Step 7: Check the status of Machine
+
+
+
+Note: Usually, after rebuilding farm, it take about 30 minutes to get the machine status healthy. Watch for the error events in the Office Web Apps events. Once you see no error or warning events for 30 min, and run the above command, it will return the status healthy.
+
+Issue: Certificate Name –
+The certificate name is a friendly name of the certificate. In some odd reasons, if the name is not in proper form, the farm will be created. However, it will never work. Therefore, based on experience working with the Office Web Apps Farms, here are some best practices for the certificate friendly name:
+
+Please don’t name the name longer than 16 characters.
+Please don’t use any space or special characters in the name (only one that is an exception is underscore “_”)
+For some reason, you have make the certificate name error then get the certificate re-issued with correct name. Then use the following command to set it:
+
+Set-OfficeWebAppsFarm –CertificateName <New Friendly Name>
