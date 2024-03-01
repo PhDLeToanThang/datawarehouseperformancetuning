@@ -35,17 +35,20 @@ Import-Module "C:\Program Files\Microsoft Office Web Apps\AdminModule\OfficeWebA
 Get-ChildItem cert:\localmachine\My\ | FL FriendlyName,Subject,NotBefore,NotAfter
 
 #New-OfficeWebAppsFarm -InternalUrl “https://<Internal URL FQDN>” -ExternalUrl “https://<External URL FQDN>”-CertificateName “<Certificate’s Friendly Name>” -EditingEnabled -AllowHTTP –Verbose
+# Deploy a multi-server, load-balanced Office Online Server farm that uses HTTPS:
+# New-OfficeWebAppsFarm -InternalUrl "https://oos.io" -ExternalUrl "https://oos.io" -SSLOffloaded -EditingEnabled
 
-New-OfficeWebAppsFarm -InternalURL "https://owa.cloud.edu.vn" -ExternalUrl "https://owa.cloud.edu.vn" -CertificateName "" -AllowHttp -EditingEnabled –Verbose
-#New-OfficeWebAppsFarm -InternalURL "https://owa.cloud.edu.vn" -AllowHttp -EditingEnabled –Verbose
-#  "[Manual] owa.cloud.edu.vn 2021/12/10 16:50:53"
+# Standalone not LBN:
+New-OfficeWebAppsFarm -InternalURL "https://oos.io" -ExternalUrl "https://oos.io" -CertificateName "" -AllowHttp -EditingEnabled –Verbose
+#New-OfficeWebAppsFarm -InternalURL "https://oos.io" -AllowHttp -EditingEnabled –Verbose
+#  "[Manual] oos.io 2021/12/10 16:50:53"
 #Remove-OfficeWebAppsMachine 
 #
-#PS C:\Windows\system32> New-OfficeWebAppsFarm -InternalURL "https://owa.cloud.edu.vn" -ExternalUrl "https://owa.cloud.edu.vn" -CertificateName "" -AllowHttp -EditingEnabled –Verbose
+#PS C:\Windows\system32> New-OfficeWebAppsFarm -InternalURL "https://oos.io" -ExternalUrl "https://oos.io" -CertificateName "" -AllowHttp -EditingEnabled –Verbose
 #VERBOSE: Performing the operation "CreateNewFarm" on target "OfficeWebAppsFarm".
 #FarmOU                            : 
-#InternalURL                       : https://owa.cloud.edu.vn/
-#ExternalURL                       : https://owa.cloud.edu.vn/
+#InternalURL                       : https://oos.io/
+#ExternalURL                       : https://oos.io/
 #AllowHTTP                         : True
 #SSLOffloaded                      : False
 #CertificateName                   : 
