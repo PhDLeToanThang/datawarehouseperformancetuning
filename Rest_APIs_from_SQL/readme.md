@@ -2,14 +2,17 @@
 
 ## Phần 1. SQL Server 2025
 
-**Người soạn:** PhD. Lê Toàn Thắng
+**Người soạn:** PhD. Lê Toàn Thắng.
 
-**Ngày viết:** 11/12/2025
+**Ngày viết:** 11/12/2025.
+
 ---
 
 #### **Giới thiệu**
 
 Trong thế giới ngày nay, dữ liệu là vua. Các công ty thu thập và lưu trữ một lượng dữ liệu khổng lồ trong các cơ sở dữ liệu của họ. Một trong những thách thức lớn nhất là làm thế nào để cung cấp (expose) dữ liệu đó cho các ứng dụng và người dùng khác nhau theo một cách an toàn và hiệu quả. API REST (Representational State Transfer) đã trở thành cách tiếp cận tiêu chuẩn để xây dựng các dịch vụ web cho phép các ứng dụng khác nhau giao tiếp với nhau.
+
+![image](https://github.com/PhDLeToanThang/datawarehouseperformancetuning/tree/master/Rest_APIs_from_SQL/Google_AI_Studio_2025-12-11T03_30_26.807Z.png)
 
 Nhưng nếu bạn có thể tạo REST API và thậm chí cả các trang web trực tiếp từ bên trong SQL Server mà không cần một lớp ứng dụng trung gian (middle-tier application) thì sao? Trong bài viết này, chúng ta sẽ khám phá một tính năng mạnh mẽ của SQL Server cho phép bạn làm chính điều đó.
 
