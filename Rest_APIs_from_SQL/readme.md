@@ -3,6 +3,7 @@
 ## Phần 1. SQL Server 2025
 
 **Người soạn:** PhD. Lê Toàn Thắng
+
 **Ngày viết:** 11/12/2025
 ---
 
