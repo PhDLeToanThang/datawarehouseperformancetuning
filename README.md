@@ -25,6 +25,7 @@ Dựa trên mô hình triển khai thực tế giữa Power BI Report Server (PB
 3\. **Mapping người dùng vào Nhóm và Vai trò:** Đây là bước then chốt. 
 Bạn cần thêm tài khoản AD vào các **Nhóm cục bộ (Local Groups)** trên máy chủ để hệ thống PBIRS nhận diện quyền hạn tương ứng. 
 
+<img width="1000" height="867" alt="image" src="https://github.com/user-attachments/assets/4f03df49-bd7f-427a-b860-7a1136d016de" />
 
 ##### Bảng so sánh vai trò và Nhóm tương ứng (Mapping Table):
 
@@ -52,6 +53,8 @@ Bạn cần thêm tài khoản AD vào các **Nhóm cục bộ (Local Groups)** 
  
  \* **Shared Metanodes:** Các thành phần workflow có khả năng tái sử dụng cao.
  
+ <img width="451" height="871" alt="image" src="https://github.com/user-attachments/assets/dc58af07-21a8-458c-90cc-8931656c429b" />
+
  **Lưu ý chuyên gia về cấu trúc URL:** 
  Thay vì sử dụng đường dẫn tuyệt đối dễ gây lỗi khi di chuyển workflow, bạn nên sử dụng cấu trúc **mountpoint-relative URL** : 
  knime://knime.mountpoint// Cấu trúc này đảm bảo tính linh hoạt (portability), giúp các liên kết dữ liệu luôn chính xác dù bạn di chuyển dự án giữa các máy tính hoặc máy chủ khác nhau.
@@ -91,6 +94,7 @@ Bạn cần thêm tài khoản AD vào các **Nhóm cục bộ (Local Groups)** 
  .knime-title { fill: green; font-weight: bold; } /\* Thêm selector 'text' phía trước để nhắm chính xác vào phần tử SVG text \*/
 text.knime-tick-label { font-style: italic; font-size: 16px; } 
  ```
+<img width="426" height="867" alt="image" src="https://github.com/user-attachments/assets/3e4882a3-c4e4-427e-b4b3-a499d1a5abbf" />
 
  #### 5\. Quy trình tích hợp: 
  Từ KNIME Analytics đến Dashboard BI an toàn Một quy trình làm việc chuyên nghiệp được tóm gọn qua 3 giai đoạn tích hợp: 
