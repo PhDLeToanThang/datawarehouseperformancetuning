@@ -89,7 +89,9 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now keycloak
 ```
 ------------------------------
-## Bước 2: Liên kết và cấu hình tối ưu User Federation với Active Directory (AD1)## 2.1 Cài đặt kết nối kết nối LDAP/AD trong Keycloak Admin Console
+## Bước 2: Liên kết và cấu hình tối ưu User Federation với Active Directory (AD1)
+
+## 2.1 Cài đặt kết nối kết nối LDAP/AD trong Keycloak Admin Console
 
    1. Truy cập trang quản trị Keycloak ➔ Chọn Realm làm việc chính (ví dụ: Company-SSO) ➔ Chọn mục User Federation ➔ Add provider ➔ ldap.
    2. Console Display Name: AD1-Local.
@@ -97,13 +99,14 @@ sudo systemctl enable --now keycloak
    4. Connection URL: Điền ldaps://ad1.yourdomain.local:636 (Khuyến cáo dùng cổng mã hóa 636 bảo vệ an toàn thông tin mật khẩu truyền tải thay vì cổng 389).
 
 ## 2.2 Đồng bộ hóa cấu hình tối ưu cho Active Directory
-
+```
 * User DN: CN=Users,DC=yourdomain,DC=local (Trỏ đúng OU chứa tài khoản nhân sự).
 * Bind DN và Bind Credential: Tài khoản có quyền read hệ thống AD (Ví dụ: CN=KeycloakBind,OU=ServiceAccounts,DC=yourdomain,DC=local).
 * User Object Classes: user, person.
 * Username LDAP Attribute: sAMAccountName (Đảm bảo người dùng nhập đúng định danh Windows cũ để đồng bộ).
 * UUID LDAP Attribute: objectGUID (Đảm bảo thuộc tính định danh duy nhất không đổi).
 * Read Only: Chọn True (Đảm bảo Keycloak chỉ đọc thông tin, không làm thay đổi trực tiếp cấu trúc cây AD1 khi không được phép).
+```
 
 ## 2.3 Thiết lập cơ chế lập lịch đồng bộ (Sync Settings)
 Để tối ưu hóa tài nguyên phần cứng, tránh nghẽn truy vấn tới AD1:
@@ -112,7 +115,9 @@ sudo systemctl enable --now keycloak
 * Periodic Changed Users Sync: Bật True ➔ Tần suất khuyến cáo: 300 giây (Cứ 5 phút quét AD một lần để cập nhật các user mới khởi tạo hoặc mới đổi mật khẩu).
 
 ------------------------------
-## Bước 3: Cấu hình bắt buộc thực hiện OTP qua QR Code trên Thiết bị di động## 3.1 Cấu hình chính sách mã OTP (OTP Policy)
+## Bước 3: Cấu hình bắt buộc thực hiện OTP qua QR Code trên Thiết bị di động
+
+## 3.1 Cấu hình chính sách mã OTP (OTP Policy)
 Trong menu quản trị Realm: Vào mục Authentication ➔ Chọn tab Policies ➔ OTP Policy:
 
 * OTP Type: Chọn TOTP (Time-Based One-Time Password).
@@ -175,17 +180,20 @@ server {
 ------------------------------
 ## Bước 5: Cấu hình Custom Authentication Extension tại Máy chủ Windows Server 2019 (PBIRS)
 Bởi vì PBIRS không thể đọc trực tiếp header HTTP từ Nginx nếu không được cấu hình chế độ Custom Security, bạn cần biên dịch thư viện mở rộng để tiếp nhận thông tin từ Header bảo mật X-MS-Authenticated-User. [5] 
+
 ## 5.1 Cài đặt Custom Authentication Extension
 
    1. Tải bộ thư viện hoặc phát triển mã nguồn mở Custom Security Extension mẫu dành cho SQL Server Reporting Services / Power BI Report Server bằng .NET C# (Microsoft cung cấp mẫu Reporting Services Custom Security Sample).
    2. Trong hàm xử lý định danh chính GetUserInfo, tiến hành thay đổi logic kiểm tra thay vì đọc Form đăng nhập cũ, chuyển sang đọc giá trị trực tiếp từ HTTP Request Headers:
-   
+```
    // Đọc định danh sAMAccountName được truyền an toàn từ Nginx proxy sau khi qua màng Keycloak OTPstring authenticatedUser = HttpContext.Current.Request.Headers["X-MS-Authenticated-User"];
-   
+```
    3. Tiến hành Build dự án lấy file thư viện liên kết động CustomSecurityExtension.dll rồi sao chép trực tiếp vào thư mục cài đặt gốc của PBIRS trên máy chủ Windows 2019:
+```
    * C:\Program Files\Microsoft Power BI Report Server\PBIRS\ReportServer\bin
       * C:\Program Files\Microsoft Power BI Report Server\PBIRS\Portal
-   
+```
+
 ## 5.2 Khai báo thay đổi phương thức xác thực trên tệp cấu hình Windows
 Mở tệp tin RSReportServer.config trên Windows Server 2019:
 
@@ -247,18 +255,20 @@ Vì Keycloak chạy trên một VM Ubuntu nội bộ phía sau HAProxy, cấu h�
 Chỉnh sửa file cấu hình Keycloak như sau:
 
 # Đổi từ production HTTPS sang nhận diện proxy ngược
+```
 http-enabled=true
 http-port=8080             # Keycloak lắng nghe port này trong mạng LAN
 proxy-headers=xforwarded   # Đọc các header X-Forwarded-For, X-Forwarded-Proto từ HAProxy
-
+```
 # Định nghĩa URL Công khai hiển thị ngoài Internet (Cực kỳ quan trọng)
+```
 hostname=://company.com   # Domain public đã trỏ về IP Public của HAProxy
-
+```
 Sau khi sửa, bạn chỉ cần chạy lại lệnh:
-
+```
 sudo -u keycloak /opt/keycloak/bin/kc.sh build
 sudo systemctl restart keycloak
-
+```
 ------------------------------
 ## Câu hỏi 2: Vị trí đặt NGINX Reverse Proxy & Phương án kiến trúc tối ưu
 
@@ -416,3 +426,156 @@ sudo systemctl restart openresty
 ------------------------------
 ## Tóm tắt các việc cần triển khai tiếp theo
 Hạ tầng của bạn hiện tại đã phân lớp rất rõ ràng và chuẩn bảo mật Defense-in-Depth (Bảo vệ nhiều lớp). HAProxy chịu tải SSL ở biên ➔ Nginx/OpenResty xử lý logic OIDC nội bộ bảo mật ➔ Keycloak kết nối AD1 lấy tài khoản và ép OTP.
+
+----
+
+# Phần 3. DNS và Cách tính độ chễ Timeout:
+
+>>>Bản ghi DNS (Public & Local) của bạn cho 2 domain ://company.com và ://company.com đã được thiết lập đồng bộ.
+Hãy viết các script haowjc chọn tools hỗ trợ kiểm tra thêm các tham số Timeout (độ trễ phiên) giữa HAProxy và Nginx để tránh tình trạng người dùng bị ngắt kết nối khi đang tương tác với các báo cáo Power BI dung lượng lớn.
+
+---
+
+Để tối ưu hóa các tham số Timeout (độ trễ phiên) và xử lý các báo cáo Power BI dung lượng lớn (thường mất nhiều thời gian truy vấn SQL hoặc truyền tải file dữ liệu nặng), việc cấu hình đồng bộ từ HAProxy ➔ Nginx (OpenResty) ➔ Windows PBIRS là bắt buộc. Nếu cấu hình không khớp, một trong các lớp proxy sẽ ngắt kết nối trước khi Power BI kịp trả kết quả về cho trình duyệt.
+Dưới đây là chi tiết các công cụ kiểm tra, kịch bản (script) mô phỏng và cấu hình tối ưu để triệt tiêu hoàn toàn lỗi ngắt kết nối.
+
+------------------------------
+
+## 1: Công cụ & Script kiểm tra tham số Timeout (Độ trễ phiên)
+Để kiểm tra xem hệ thống có bị ngắt kết nối (Gateway Timeout - 504) khi tải báo cáo nặng hay không, chúng ta sử dụng 2 phương pháp: Mô phỏng bằng Script Python và Đo lường bằng công cụ ApacheBench (ab).
+
+## 1.1 Script Python mô phỏng Request giữ kết nối lâu (Long-Running Request)
+Script này sử dụng thư viện requests để gửi một yêu cầu truy cập báo cáo và đo chính xác số giây tối đa mà hệ thống cho phép duy trì kết nối trước khi bị Proxy ngắt ngang.
+Bạn tạo file test_timeout.py trên một máy tính ngoài Internet (hoặc máy test):
+
+```
+import requestsimport time
+# URL báo cáo Power BI Public qua HAProxyurl = "https://company.com"
+# Cấu hình Header giả lập trình duyệt và truyền Cookie Session (nếu có)headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp"
+}
+
+print(0"[*] Bắt đầu gửi request kiểm tra trần Timeout của hệ thống...")start_time = time.time()
+try:
+    # Thiết lập timeout phía client cực lớn (10 phút) để xem proxy ngắt ở giây thứ bao nhiêu
+    response = requests.get(url, headers=headers, timeout=600, verify=True)
+    elapsed = time.time() - start_time
+    print(f"[+] Phản hồi từ máy chủ thành công!")
+    print(f"[+] Mã trạng thái (Status Code): {response.status_code}")
+    print(f"[+] Thời gian phản hồi tổng cộng: {elapsed:.2f} giây")except requests.exceptions.ConnectionError as e:
+    elapsed = time.time() - start_time
+    print(f"[-] KẾT NỐI BỊ NGẮT BỞI PROXY (Connection Reset/Closed) ở giây thứ: {elapsed:.2f}")except requests.exceptions.Timeout:
+    elapsed = time.time() - start_time
+    print(f"[-] Client Timeout vượt ngưỡng sau {elapsed:.2f} giây")
+```
+
+* Cách đánh giá kết quả: Nếu chạy script mà kết nối bị ngắt ở khoảng 30 giây hoặc 60 giây với mã lỗi 504 Gateway Timeout hoặc 502 Bad Gateway, điều đó chứng tỏ cấu hình mặc định của HAProxy hoặc Nginx đang quá ngắn đối với Power BI.
+
+## 1.2 Sử dụng công cụ ApacheBench (ab) để kiểm tra độ trễ dưới tải (Latency & Timeout)
+Cài đặt công cụ trên máy Ubuntu hoặc máy test để kiểm tra khả năng duy trì kết nối liên tục:
+```
+sudo apt install apache2-utils -y
+```
+Chạy lệnh gửi 50 request (mỗi lần 2 request đồng thời) với thời gian chờ tối đa cho mỗi request là 300 giây (-t 300):
+```
+ab -n 50 -c 2 -s 300 https://company.com
+```
+
+* **Thông số cần nhìn vào:** Kết quả hiển thị tại mục "Percentage of the requests served within a certain time". Nếu có request nào tốn nhiều thời gian mà xuất hiện trong mục "Failed requests", hệ thống đang bị nghẽn và ngắt kết nối sớm ở các tầng proxy.
+
+------------------------------
+
+# PHẦN 2: Cấu hình tối ưu tham số Timeout trên toàn chuỗi hệ thống
+Để xử lý triệt để dữ liệu lớn, quy tắc bất di dịch là: Thời gian timeout tầng ngoài cùng (HAProxy) phải LỚN HƠN HOẶC BẰNG tầng giữa (Nginx), và tầng giữa phải LỚN HƠN thời gian xử lý tối đa của tầng gốc (Power BI/SQL Server). Khuyến cáo đặt trần giữ kết nối là 5 phút (300 giây) đến 10 phút (600 giây).
+
+## 2.1 Tối ưu cấu hình HAProxy 2.9 (/etc/haproxy/haproxy.cfg)
+Trong mục defaults hoặc cấu hình riêng cho backend powerbi_backend, tăng các tham số kiểm soát luồng dữ liệu (đặc biệt là timeout server và timeout tunnel cho WebSocket nếu Power BI dùng kết nối thời gian thực):
+
+```
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    
+    # Các tham số tối ưu cho Power BI Report dung lượng lớn
+    timeout connect         10s   # Thời gian thiết lập kết nối TCP (để ngắn)
+    timeout client          5m    # Thời gian chờ Client (trình duyệt) truyền dữ liệu
+    timeout server          5m    # Thời gian chờ Máy chủ backend trả dữ liệu (Tăng lên 5 phút)
+    timeout http-keep-alive 30s   # Giữ kết nối HTTP sống để tải nhanh các tài nguyên nhỏ
+    timeout http-request    30s   # Giới hạn thời gian client gửi trọn vẹn request
+    timeout queue           1m    # Thời gian chờ trong hàng đợi nếu backend bị quá tải
+
+backend powerbi_backend
+    mode http
+    # Nếu Power BI sử dụng các tính năng tương tác kéo thả liên tục qua WebSocket/EventSource
+    timeout tunnel          1h    # Giữ tunnel mở lâu cho kết nối đặc thù biệt lập
+    server nginx_proxy_server 192.168.1.50:80 check inter 5s fastinter 2s downinter 8s
+```
+
+## 2.2 Tối ưu cấu hình Nginx / OpenResty (/etc/openresty/nginx.conf)
+Khi người dùng tải báo cáo lớn, Nginx đóng vai trò nhận dữ liệu từ Windows Server rồi đẩy ra HAProxy. Cần tăng timeout nhận/gửi và cấu hình bộ đệm (Buffer) để Nginx không ghi đĩa tạm làm chậm tiến trình.
+Sửa khối location / trong Nginx:
+
+```
+location / {
+    # 1. Tối ưu hóa tham số kết nối và độ trễ phiên (Timeouts)
+    proxy_connect_timeout       30s;  # Thời gian kết nối tới Windows Server
+    proxy_send_timeout          300s; # Thời gian gửi request sang Windows Server (5 phút)
+    proxy_read_timeout          300s; # Thời gian chờ Windows Server phản hồi kết quả (5 phút)
+    
+    # Giữ kết nối HTTP hoạt động liên tục giữa Nginx và Windows Server
+    keepalive_timeout           300s; 
+    keepalive_requests          10000;
+
+    # 2. Tối ưu hóa bộ đệm (Buffers) tránh nghẽn khi tải File Báo cáo nặng (.pbix)
+    proxy_buffering             on;
+    proxy_buffer_size           256k;    # Tăng dung lượng header nhận diện dữ liệu lớn
+    proxy_buffers               8 512k;  # Cấp phát vùng nhớ RAM đệm lớn cho luồng dữ liệu
+    proxy_busy_buffers_size     1024k;
+    proxy_temp_file_write_size  1024k;
+    
+    # 3. Tăng giới hạn dung lượng file upload (Nếu người dùng có quyền upload file .pbix qua Web)
+    client_max_body_size        500M;    # Cho phép file lên đến 500 Megabytes
+
+    # Giữ nguyên cấu hình phân tách xử lý mã Lua OpenID Connect đã thiết lập ở bước trước...
+    access_by_lua_block {
+        -- [Mã Lua xác thực Keycloak giữ nguyên]
+    }
+
+    proxy_pass http://192.168.1.100:80;
+    # ... các dòng proxy_set_header giữ nguyên ...
+}
+```
+
+## 2.3 Cấu hình bổ sung trên Windows Server 2019 (Power BI Report Server)
+Đôi khi bản thân IIS hoặc dịch vụ HTTP.sys của Windows tự ngắt kết nối trước 5 phút. Hãy đảm bảo cấu hình trong file web cấu hình hệ thống đồng bộ.
+Mở file web.config của ReportServer (thường nằm tại C:\Program Files\Microsoft Power BI Report Server\PBIRS\ReportServer\web.config), tìm và tăng giá trị executionTimeout (tính bằng giây):
+
+```
+<configuration>
+  <system.web>
+    <!-- Tăng thời gian thực thi tối đa của các script/request lên 300 giây (5 phút) -->
+    <httpRuntime executionTimeout="300" maxRequestLength="512000" />
+  </system.web>
+</configuration>
+```
+------------------------------
+# PHẦN 3: Triển khai & Áp dụng
+Sau khi điều chỉnh toàn bộ các file cấu hình trên, bạn thực hiện khởi động lại dịch vụ theo thứ tự từ trong ra ngoài để áp dụng cấu hình sạch:
+
+   1. Trên Windows Server: Khởi động lại dịch vụ Power BI bằng Report Server Configuration Manager.
+   2. Trên VM Ubuntu (Keycloak/Nginx): Chạy lệnh làm sạch proxy:
+      
+   ```
+   sudo systemctl restart openresty
+   ```
+
+   3. Trên VM HAProxy (Biên): Kiểm tra cú pháp cấu hình và reload dịch vụ:
+   ```
+   haproxy -c -f /etc/haproxy/haproxy.cfg # Đảm bảo thông báo "Configuration file is valid"
+   sudo systemctl restart haproxy
+   ```
+   
+Khi hoàn tất, bạn hãy chạy lại Script Python (test_timeout.py) ở Phần 1 để nghiệm thu. Hệ thống sẽ duy trì kết nối mượt mà vượt qua các mốc thời gian tải báo cáo phức tạp.
