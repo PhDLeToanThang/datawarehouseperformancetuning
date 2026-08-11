@@ -40,12 +40,12 @@ Những chi tiết đó định hình cách mô hình diễn giải ý định, 
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    AI Agent Pipeline                         │
+│                    AI Agent Pipeline                        │
 │                                                             │
 │  User Input → LLM Reasoning → Tool Selection → Execution    │
 │                                    ↓                        │
 │                           Tool Design Quality               │
-│                           (quyết định thành công/thất bại)   │
+│                           (quyết định thành công/thất bại)  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -110,15 +110,15 @@ class CreateTaskInput(BaseModel):
 
 ```
 ┌──────────────────────────────────────────────────┐
-│            Loose Schema vs Tight Schema           │
-│                                                    │
-│  Loose: {"param": "any string"}                   │
-│    → Model phải đoán constraints                   │
-│    → Lỗi chỉ phát hiện ở runtime                   │
-│                                                    │
-│  Tight: Enum + Regex + MinLength + MaxLength      │
-│    → Constraints encoded trong schema              │
-│    → Lỗi phát hiện ngay tại tool boundary          │
+│            Loose Schema vs Tight Schema          │
+│                                                  │
+│  Loose: {"param": "any string"}                  │
+│    → Model phải đoán constraints                 │
+│    → Lỗi chỉ phát hiện ở runtime                 │
+│                                                  │
+│  Tight: Enum + Regex + MinLength + MaxLength     │
+│    → Constraints encoded trong schema            │
+│    → Lỗi phát hiện ngay tại tool boundary        │
 └──────────────────────────────────────────────────┘
 ```
 
@@ -218,20 +218,20 @@ def search_products(query: str, category: str = None, max_price: float = None) -
 
 ```
 Context Window với tất cả tools:
-┌──────────────────────────────────────────────────────┐
-│ System Prompt (5K tokens)                             │
-│ Tool Definitions (50 tools × 500 tokens = 25K tokens) │
+┌────────────────────────────────────────────────────────┐
+│ System Prompt (5K tokens)                              │
+│ Tool Definitions (50 tools × 500 tokens = 25K tokens)  │
 │ Conversation History (10K tokens)                      │
-│ → Còn rất ít token cho reasoning                      │
-└──────────────────────────────────────────────────────┘
+│ → Còn rất ít token cho reasoning                       │
+└────────────────────────────────────────────────────────┘
 
 Context Window với dynamic loading:
-┌──────────────────────────────────────┐
+┌───────────────────────────────────────┐
 │ System Prompt (5K tokens)             │
 │ Relevant Tools Only (3-5 tools)       │
 │ Conversation History (10K tokens)     │
 │ → Nhiều token cho reasoning           │
-└──────────────────────────────────────┘
+└───────────────────────────────────────┘
 ```
 
 **Giải pháp**: Dynamic tool loading theo step.
@@ -323,13 +323,13 @@ def confirm_deletion(token: str) -> DeletionResult:
 ```
 ┌──────────┐     stage_deletion()     ┌──────────────┐
 │  User    │ ──────────────────────→  │   Staged     │
-│  Request │                         │  (chờ xác    │
-│          │ ←── token + preview ─── │   nhận)      │
-│          │                         └──────────────┘
+│  Request │                          │  (chờ xác    │
+│          │ ←── token + preview ───  │   nhận)      │
+│          │                          └──────────────┘
 │          │     confirm_deletion()      ↓
 │          │ ──────────────────────→  ┌──────────────┐
-│          │                         │  Executed    │
-└──────────┘                         └──────────────┘
+│          │                          │  Executed    │
+└──────────┘                          └──────────────┘
 ```
 
 ---
@@ -356,35 +356,35 @@ def confirm_deletion(token: str) -> DeletionResult:
 ### 5.1. Phân loại theo khả năng
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    PHÂN LOẠI MÔ HÌNH AI                             │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  📦 MÔ HÌNH NỀN TẢNG (Foundation Models)                           │
+┌────────────────────────────────────────────────────────────────────┐
+│                    PHÂN LOẠI MÔ HÌNH AI                            │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  📦 MÔ HÌNH NỀN TẢNG (Foundation Models)                          │
 │  ┌─────────────────────────────────────────────────────────────┐   │
-│  │ GPT-4o, Claude 3.5/4, Gemini 2.5, DeepSeek-V3, Llama 4     │   │
+│  │ GPT-4o, Claude 3.5/4, Gemini 2.5, DeepSeek-V3, Llama 4      │   │
 │  │ → Đa năng, hiểu ngữ cảnh sâu, tool calling mạnh             │   │
 │  │ → Hiệu quả: Khi có thiết kế tool tốt                        │   │
-│  │ → Không hiệu quả: Khi tool design lỏng lẻo                   │   │
+│  │ → Không hiệu quả: Khi tool design lỏng lẻo                  │   │
 │  └─────────────────────────────────────────────────────────────┘   │
-│                                                                     │
+│                                                                    │
 │  🔧 MÔ HÌNH CHUYÊN DỤNG (Specialized Models)                       │
 │  ┌─────────────────────────────────────────────────────────────┐   │
-│  │ Codex (code), Stable Diffusion (image), Whisper (audio)    │   │
+│  │ Codex (code), Stable Diffusion (image), Whisper (audio)     │   │
 │  │ → Tối ưu cho một tác vụ cụ thể                              │   │
-│  │ → Hiệu quả: Trong domain được train                          │   │
-│  │ → Không hiệu quả: Ngoài domain chuyên biệt                   │   │
+│  │ → Hiệu quả: Trong domain được train                         │   │
+│  │ → Không hiệu quả: Ngoài domain chuyên biệt                  │   │
 │  └─────────────────────────────────────────────────────────────┘   │
-│                                                                     │
+│                                                                    │
 │  🤖 MÔ HÌNH SUY LUẬN (Reasoning Models)                            │
 │  ┌─────────────────────────────────────────────────────────────┐   │
-│  │ o1, o3, Claude Opus, Gemini Thinking, DeepSeek-R1          │   │
+│  │ o1, o3, Claude Opus, Gemini Thinking, DeepSeek-R1           │   │
 │  │ → Chain-of-thought, tự kiểm tra, tự sửa lỗi                 │   │
-│  │ → Hiệu quả: Bài toán logic, toán, lập kế hoạch phức tạp    │   │
+│  │ → Hiệu quả: Bài toán logic, toán, lập kế hoạch phức tạp     │   │
 │  │ → Không hiệu quả: Task đơn giản (latency cao, cost cao)     │   │
 │  └─────────────────────────────────────────────────────────────┘   │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
+│                                                                    │
+└────────────────────────────────────────────────────────────────────┘
 ```
 
 ### 5.2. Phân loại Agentic AI theo mức độ tự động
@@ -490,9 +490,9 @@ có AI  đơn   Agent  Agent  omous  Org
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                      AI Agent + Database                         │
+│                      AI Agent + Database                        │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
+│                                                                 │
 │  ┌──────────┐     ┌──────────┐     ┌──────────────────────┐     │
 │  │  User    │────→│  LLM     │────→│   Tool Layer         │     │
 │  │  Input   │     │  (Agent) │     │   ┌──────────────┐   │     │
@@ -509,7 +509,7 @@ có AI  đơn   Agent  Agent  omous  Org
 │                   └──────────┘     └──────────┬───────────┘     │
 │                                               │                 │
 │                                               ↓                 │
-│                                   ┌──────────────────────┐     │
+│                                   ┌───────────────────────┐     │
 │                                   │    Database Layer     │     │
 │                                   │  ┌────────────────┐   │     │
 │                                   │  │ PostgreSQL     │   │     │
@@ -521,8 +521,8 @@ có AI  đơn   Agent  Agent  omous  Org
 │                                   │  ├────────────────┤   │     │
 │                                   │  │ Oracle DB      │   │     │
 │                                   │  └────────────────┘   │     │
-│                                   └──────────────────────┘     │
-│                                                                  │
+│                                   └───────────────────────┘     │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -692,32 +692,32 @@ db.products.aggregate([
 Một trong những ứng dụng quan trọng nhất của database trong AI Agent là **persistent memory**.
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│               THREE TYPES OF AGENT MEMORY                    │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  📝 EPISODIC MEMORY (Ký ức sự kiện)                         │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │ Lưu: conversation turns, tool calls, API results    │   │
-│  │ DB: PostgreSQL hypertable (time-series)             │   │
-│  │ Query: "What did we discuss yesterday?"             │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                                                             │
-│  🧠 SEMANTIC MEMORY (Ký ức ngữ nghĩa)                       │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │ Lưu: embeddings, knowledge graph, patterns          │   │
-│  │ DB: pgvector, MongoDB Atlas, Neo4j                  │   │
-│  │ Query: "Find similar cases to this problem"         │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                                                             │
-│  ⚙️ PROCEDURAL MEMORY (Ký ức thủ tục)                      │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │ Lưu: user preferences, workflows, rules             │   │
-│  │ DB: Standard relational tables (ACID)               │   │
-│  │ Query: "What format does the user prefer for exports?"│  │
-│  └─────────────────────────────────────────────────────┘   │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│               THREE TYPES OF AGENT MEMORY                     │
+├───────────────────────────────────────────────────────────────┤
+│                                                               │
+│  📝 EPISODIC MEMORY (Ký ức sự kiện)                           │
+│  ┌─────────────────────────────────────────────────────┐      │
+│  │ Lưu: conversation turns, tool calls, API results    │      │
+│  │ DB: PostgreSQL hypertable (time-series)             │      │
+│  │ Query: "What did we discuss yesterday?"             │      │
+│  └─────────────────────────────────────────────────────┘      │
+│                                                               │
+│  🧠 SEMANTIC MEMORY (Ký ức ngữ nghĩa)                        │
+│  ┌─────────────────────────────────────────────────────┐      │
+│  │ Lưu: embeddings, knowledge graph, patterns          │      │
+│  │ DB: pgvector, MongoDB Atlas, Neo4j                  │      │
+│  │ Query: "Find similar cases to this problem"         │      │
+│  └─────────────────────────────────────────────────────┘      │
+│                                                               │
+│  ⚙️ PROCEDURAL MEMORY (Ký ức thủ tục)                         │
+│  ┌────────────────────────────────────────────────────────┐   │
+│  │ Lưu: user preferences, workflows, rules                │   │
+│  │ DB: Standard relational tables (ACID)                  │   │
+│  │ Query: "What format does the user prefer for exports?" │   │
+│  └────────────────────────────────────────────────────────┘   │
+│                                                               │
+└───────────────────────────────────────────────────────────────┘
 ```
 
 ### 7.5. MCP — Model Context Protocol
@@ -726,12 +726,12 @@ MCP là chuẩn do Anthropic phát triển, cho phép AI Agent kết nối an to
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│              MCP Architecture                         │
-│                                                       │
+│              MCP Architecture                        │
+│                                                      │
 │  ┌──────────┐          ┌──────────────────────┐      │
-│  │   Host   │          │   MCP Server          │      │
+│  │   Host   │          │   MCP Server         │      │
 │  │ (Claude, │ ←─MCP──→ │   ┌────────────────┐ │      │
-│  │  IDE)    │ Protocol  │   │ PostgreSQL     │ │      │
+│  │  IDE)    │Protocol  │   │ PostgreSQL     │ │      │
 │  └──────────┘          │   │ Server         │ │      │
 │                        │   ├────────────────┤ │      │
 │                        │   │ MySQL Server   │ │      │
@@ -781,15 +781,15 @@ Text-to-SQL truyền thống:
 
 Agentic BI:
 ┌──────────┐    ┌────────────────────────────┐    ┌──────────┐
-│  User    │───→│  AI Agent                   │───→│  Insight │
-│  Question│    │  ┌──────────────────────┐   │    │  + Viz   │
-│          │    │  │ 1. Schema Discovery  │   │    │  + Report│
-│          │    │  │ 2. Query Planning    │   │    └──────────┘
-│          │    │  │ 3. SQL Generation    │   │
-│          │    │  │ 4. Result Analysis   │   │
-│          │    │  │ 5. Visualization     │   │
-│          │    │  │ 6. Self-Correction   │   │
-│          │    │  └──────────────────────┘   │
+│  User    │───→│  AI Agent                  │───→│  Insight │
+│  Question│    │  ┌──────────────────────┐  │    │  + Viz   │
+│          │    │  │ 1. Schema Discovery  │  │    │  + Report│
+│          │    │  │ 2. Query Planning    │  │    └──────────┘
+│          │    │  │ 3. SQL Generation    │  │
+│          │    │  │ 4. Result Analysis   │  │
+│          │    │  │ 5. Visualization     │  │
+│          │    │  │ 6. Self-Correction   │  │
+│          │    │  └──────────────────────┘  │
 │          │    └────────────────────────────┘
 └──────────┘
 ```
@@ -800,23 +800,22 @@ WrenAI là một trong những công cụ Agentic BI hàng đầu (15K stars).
 
 **Kiến trúc**:
 ```
-┌──────────────────────────────────────────────────┐
+┌───────────────────────────────────────────────────┐
 │                   WrenAI                          │
-├──────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────┐  │
-│  │ Semantic    │  │ Text-to-SQL │  │ Chart   │  │
-│  │ Layer       │  │ Engine      │  │ Builder │  │
-│  ├─────────────┤  ├─────────────┤  ├─────────┤  │
-│  │ Business    │  │ Multi-turn  │  │ Auto    │  │
-│  │ Definitions │  │ Correction  │  │ Dashboard│  │
-│  └─────────────┘  └─────────────┘  └─────────┘  │
-├──────────────────────────────────────────────────┤
-│  ┌──────────────────────────────────────────┐    │
-│  │  20+ Data Sources                        │    │
-│  │  PostgreSQL │ MySQL │ BigQuery │ Snowflake│   │
-│  │  ClickHouse │ MongoDB │ REST API │ ...    │   │
-│  └──────────────────────────────────────────┘    │
-└──────────────────────────────────────────────────┘
+├───────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │
+│  │ Semantic    │  │ Text-to-SQL │  │ Chart     │  │
+│  │ Layer       │  │ Engine      │  │ Builder   │  │
+│  ├─────────────┤  ├─────────────┤  ├───────────┤  │
+│  │ Business    │  │ Multi-turn  │  │ Auto      │  │
+│  │ Definitions │  │ Correction  │  │ Dashboard │  │
+│  └─────────────┘  └─────────────┘  └───────────┘  │
+├───────────────────────────────────────────────────┤
+│  ┌────────────────────────────────────────────┐   │
+│  │  PostgreSQL │ MySQL │ BigQuery │ Snowflake │   │
+│  │  ClickHouse │ MongoDB │ REST API │ ...     │   │
+│  └────────────────────────────────────────────┘   │
+└───────────────────────────────────────────────────┘
 ```
 
 **Tính năng nổi bật**:
@@ -844,43 +843,43 @@ WrenAI là một trong những công cụ Agentic BI hàng đầu (15K stars).
 ┌─────────────────────────────────────────────────────────────────┐
 │                    PRODUCTION ARCHITECTURE                      │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
+│                                                                 │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │                    APPLICATION LAYER                      │   │
+│  │                    APPLICATION LAYER                     │   │
 │  │  ┌─────────────────────────────────────────────────────┐ │   │
 │  │  │  API Gateway (FastAPI / Express / ...)              │ │   │
 │  │  └─────────────────────────────────────────────────────┘ │   │
 │  └──────────────────────────────────────────────────────────┘   │
-│                              │                                   │
+│                              │                                  │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │                    AGENT LAYER                            │   │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────────────────┐   │   │
-│  │  │  Claude  │  │  GPT-4o  │  │  Open Source (Llama) │   │   │
-│  │  │  Agent   │  │  Agent   │  │  Agent (Self-hosted) │   │   │
-│  │  └──────────┘  └──────────┘  └──────────────────────┘   │   │
+│  │                    AGENT LAYER                           │   │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────────────────┐    │   │
+│  │  │  Claude  │  │  GPT-4o  │  │  Open Source (Llama) │    │   │
+│  │  │  Agent   │  │  Agent   │  │  Agent (Self-hosted) │    │   │
+│  │  └──────────┘  └──────────┘  └──────────────────────┘    │   │
 │  │         │            │                    │              │   │
 │  │         └────────────┴────────────────────┘              │   │
-│  │                        │                                  │   │
+│  │                        │                                 │   │
 │  │  ┌──────────────────────────────────────────────────┐    │   │
 │  │  │           Tool Registry (MCP Compatible)         │    │   │
-│  │  │  ┌──────────┐ ┌──────────┐ ┌────────────────┐  │    │   │
-│  │  │  │ Schema   │ │ SQL     │ │ Report         │  │    │   │
-│  │  │  │ Inspector│ │ Executor│ │ Generator      │  │    │   │
-│  │  │  └──────────┘ └──────────┘ └────────────────┘  │    │   │
+│  │  │  ┌──────────┐ ┌──────────┐ ┌────────────────┐    │    │   │
+│  │  │  │ Schema   │ │ SQL      │ │ Report         │    │    │   │
+│  │  │  │ Inspector│ │ Executor │ │ Generator      │    │    │   │
+│  │  │  └──────────┘ └──────────┘ └────────────────┘    │    │   │
 │  │  └──────────────────────────────────────────────────┘    │   │
 │  └──────────────────────────────────────────────────────────┘   │
-│                              │                                   │
+│                              │                                  │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │                    DATA LAYER                             │   │
+│  │                    DATA LAYER                            │   │
 │  │                                                          │   │
 │  │  ┌──────────────────────────────────────────────────┐    │   │
-│  │  │           PostgreSQL / YugabyteDB                 │    │   │
-│  │  │                                                   │    │   │
-│  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────┐  │    │   │
-│  │  │  │ Episodic    │  │ Semantic    │  │ Proced. │  │    │   │
-│  │  │  │ Memory      │  │ Memory     │  │ Memory  │  │    │   │
-│  │  │  │ (hypertable)│  │ (pgvector) │  │ (relat) │  │    │   │
-│  │  │  └─────────────┘  └─────────────┘  └─────────┘  │    │   │
+│  │  │           PostgreSQL / YugabyteDB                │    │   │
+│  │  │                                                  │    │   │
+│  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────┐   │    │   │
+│  │  │  │ Episodic    │  │ Semantic    │  │ Proced. │   │    │   │
+│  │  │  │ Memory      │  │ Memory      │  │ Memory  │   │    │   │
+│  │  │  │ (hypertable)│  │ (pgvector)  │  │ (relat) │   │    │   │
+│  │  │  └─────────────┘  └─────────────┘  └─────────┘   │    │   │
 │  │  └──────────────────────────────────────────────────┘    │   │
 │  │                                                          │   │
 │  │  ┌──────────────────┐  ┌──────────────────┐              │   │
@@ -888,7 +887,7 @@ WrenAI là một trong những công cụ Agentic BI hàng đầu (15K stars).
 │  │  │ (Legacy Apps)    │  │ (Documents + Vec)│              │   │
 │  │  └──────────────────┘  └──────────────────┘              │   │
 │  └──────────────────────────────────────────────────────────┘   │
-│                                                                  │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -898,30 +897,29 @@ WrenAI là một trong những công cụ Agentic BI hàng đầu (15K stars).
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│              AVideo + AI Agent Architecture                      │
+│              AVideo + AI Agent Architecture                     │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
+│                                                                 │
 │  User (Web/Mobile)                                              │
 │       │                                                         │
 │       ↓                                                         │
 │  ┌──────────────────┐                                           │
 │  │   AVideo Site    │  Apache (PHP)                             │
-│  │   (media.cloud   │                                           │
-│  │    .edu.vn)      │                                           │
+│  │   (media CDN)    │                                           │
 │  └────────┬─────────┘                                           │
 │           │                                                     │
-│  ┌────────┴─────────┐  ┌──────────────────────┐                │
-│  │   MariaDB        │  │   AI Agent Layer     │                │
-│  │   (avideo DB)    │  │   (Python/LangGraph) │                │
-│  │                  │←─│                      │                │
-│  │  - users         │  │  Text-to-SQL Tool    │                │
-│  │  - videos        │  │  Video Analytics     │                │
-│  │  - live_servers  │  │  Report Generation   │                │
-│  │  - plugins       │  │  Auto Moderation     │                │
-│  └──────────────────┘  └──────────────────────┘                │
+│  ┌────────┴─────────┐  ┌──────────────────────┐                 │
+│  │   MariaDB        │  │   AI Agent Layer     │                 │
+│  │   (avideo DB)    │  │   (Python/LangGraph) │                 │
+│  │                  │←─│                      │                 │
+│  │  - users         │  │  Text-to-SQL Tool    │                 │
+│  │  - videos        │  │  Video Analytics     │                 │
+│  │  - live_servers  │  │  Report Generation   │                 │
+│  │  - plugins       │  │  Auto Moderation     │                 │
+│  └──────────────────┘  └──────────────────────┘                 │
 │           │                                                     │
 │  ┌────────┴─────────┐                                           │
-│  │   Nginx RTMP     │  Live Streaming                          │
+│  │   Nginx RTMP     │  Live Streaming                           │
 │  │   (1935/8080/    │                                           │
 │  │    8443)         │                                           │
 │  └──────────────────┘                                           │
@@ -988,4 +986,4 @@ Giai đoạn 4: Autonomous Agentic Organization
 > **Cập nhật**: Tháng 6, 2026  
 > **Phiên bản**: 1.0  
 > **Giấy phép**: CC BY-NC 4.0  
-> **Dự án**: media.cloud.edu.vn — AVideo Platform & AI Agent Integration
+> **Dự án**: media CDN — CDN Platform & AI Agent Integration
