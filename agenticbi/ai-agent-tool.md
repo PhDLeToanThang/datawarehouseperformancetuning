@@ -4,7 +4,7 @@
 > **Nguồn tham khảo**:  
 > - MachineLearningMastery.com — "AI Agent Tool Design: What Works and What Doesn't" (Bala Priya C, 2026)  
 > - WecommitAI — "AI Agent kết hợp với Database" (Trần Quốc Huy, 2026)  
-> - WWBN/AVideo Open Source Platform  
+> - WWBN/Media CDN Open Source Platform  
 > - PostgreSQL HTX — "LLM Agents and PostgreSQL in 2026"  
 > - MongoDB — "AI Agent Memory Architecture"  
 > - OpenAgentSkill Registry  
@@ -676,7 +676,7 @@ db.products.aggregate([
 **Khi nào hiệu quả**:
 - Hệ thống cũ (legacy) cần AI Agent truy vấn
 - Chi phí thấp, eco-system rộng
-- Tương thích cao với các ứng dụng PHP (như AVideo)
+- Tương thích cao với các ứng dụng PHP (như Media CDN)
 
 **Hạn chế**: Vector search chưa native (cần plugin hoặc external)
 
@@ -891,26 +891,26 @@ WrenAI là một trong những công cụ Agentic BI hàng đầu (15K stars).
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 9.2. AVideo + AI Agent Integration Pattern
+### 9.2. Media CDN + AI Agent Integration Pattern
 
-Áp dụng cho platform AVideo đang triển khai:
+Áp dụng cho platform Media CDN đang triển khai:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│              AVideo + AI Agent Architecture                     │
+│              Media CDN + AI Agent Architecture                  │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  User (Web/Mobile)                                              │
 │       │                                                         │
 │       ↓                                                         │
 │  ┌──────────────────┐                                           │
-│  │   AVideo Site    │  Apache (PHP)                             │
+│  │   Media CDN Site │  Apache (PHP)                             │
 │  │   (media CDN)    │                                           │
 │  └────────┬─────────┘                                           │
 │           │                                                     │
 │  ┌────────┴─────────┐  ┌──────────────────────┐                 │
 │  │   MariaDB        │  │   AI Agent Layer     │                 │
-│  │   (avideo DB)    │  │   (Python/LangGraph) │                 │
+│  │   (Media CDN DB  │  │   (Python/LangGraph) │                 │
 │  │                  │←─│                      │                 │
 │  │  - users         │  │  Text-to-SQL Tool    │                 │
 │  │  - videos        │  │  Video Analytics     │                 │
