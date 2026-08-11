@@ -486,7 +486,7 @@ ab -n 50 -c 2 -s 300 https://company.com
 
 ------------------------------
 
-# PHẦN 2: Cấu hình tối ưu tham số Timeout trên toàn chuỗi hệ thống
+# 2: Cấu hình tối ưu tham số Timeout trên toàn chuỗi hệ thống
 Để xử lý triệt để dữ liệu lớn, quy tắc bất di dịch là: Thời gian timeout tầng ngoài cùng (HAProxy) phải LỚN HƠN HOẶC BẰNG tầng giữa (Nginx), và tầng giữa phải LỚN HƠN thời gian xử lý tối đa của tầng gốc (Power BI/SQL Server). Khuyến cáo đặt trần giữ kết nối là 5 phút (300 giây) đến 10 phút (600 giây).
 
 ## 2.1 Tối ưu cấu hình HAProxy 2.9 (/etc/haproxy/haproxy.cfg)
@@ -562,7 +562,7 @@ Mở file web.config của ReportServer (thường nằm tại C:\Program Files\
 </configuration>
 ```
 ------------------------------
-# PHẦN 3: Triển khai & Áp dụng
+# 3: Triển khai & Áp dụng
 Sau khi điều chỉnh toàn bộ các file cấu hình trên, bạn thực hiện khởi động lại dịch vụ theo thứ tự từ trong ra ngoài để áp dụng cấu hình sạch:
 
    1. Trên Windows Server: Khởi động lại dịch vụ Power BI bằng Report Server Configuration Manager.
